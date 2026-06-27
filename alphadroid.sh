@@ -132,7 +132,7 @@ start_build_process() {
     if [ -f /opt/crave/resync.sh ]; then
       /opt/crave/resync.sh
     fi
-    repo sync -c --force-sync --no-clone-bundle --no-tags
+    repo sync -c --force-sync --no-clone-bundle --no-tags -j8
     
     echo "Patch frameroks_native..."
     cd frameworks/native
