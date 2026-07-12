@@ -4,11 +4,11 @@
 # CONFIGURATION
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
-TG_BOT_TOKEN=$(echo "*REMOVED*" | base64 -d)
-TG_CHAT_ID=$(echo "*REMOVED*" | base64 -d)
+TG_BOT_TOKEN=$(echo "*REMOVED*")
+TG_CHAT_ID=$(echo "*REMOVED*")
 DEVICE_CODE="unknown"
 BUILD_TARGET="LineageOS"
-ANDROID_VERSION="16"
+ANDROID_VERSION="17"
 
 # Setup Timezone
 export TZ="Asia/Jakarta"
@@ -128,7 +128,7 @@ start_build_process() {
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init -u https://github.com/LineageOS/android.git -b lineage-23.2 --git-lfs --no-clone-bundle
+    repo init -u https://github.com/LineageOS/android.git -b lineage-24.0 --git-lfs --no-clone-bundle 
 
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
