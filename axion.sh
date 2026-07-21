@@ -7,7 +7,7 @@
 TG_BOT_TOKEN=$(echo "*REMOVED*")
 TG_CHAT_ID=$(echo "*REMOVED*")
 DEVICE_CODE="unknown"
-BUILD_TARGET="LineageOS"
+BUILD_TARGET="AxionOS"
 ANDROID_VERSION="16"
 
 # AxionOS "About phone" / device info values
