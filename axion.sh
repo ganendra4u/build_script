@@ -162,6 +162,16 @@ start_build_process() {
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE"
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common
     git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv
+
+mkdir -p device/sony/apollo/sepolicy/vendor
+
+cat > device/sony/apollo/sepolicy/vendor/battery.te << 'EOF'
+allow ax_diagnostics sysfs_battery_supply:dir { open getattr read search ioctl lock watch watch_reads };
+EOF
+
+sed -i '/DEVICE_PATH := device\/sony\/apollo/a\\nBOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor' device/sony/apollo/BoardConfig.mk
+
+cat device/sony/apollo/BoardConfig.mk
     
     echo "Starting ROM build..."
     . build/envsetup.sh
