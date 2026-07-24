@@ -156,6 +156,8 @@ start_build_process() {
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE"
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common
     git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv
+
+    WITH_GMS := false
     
     echo "Starting ROM build..."
     . build/envsetup.sh
