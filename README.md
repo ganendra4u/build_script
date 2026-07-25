@@ -15,4 +15,4 @@ crave run --no-patch -- "curl -fsSL https://raw.githubusercontent.com/ganendra4u
 crave run --no-patch -- "curl -fsSL https://raw.githubusercontent.com/ganendra4u/build_script/main/axion.sh | bash -s -- --apollo"
 ```
 
-#replace the --apollo flag with another device codename (only tama)
+replace the --apollo flag with another device codename (only tama)
