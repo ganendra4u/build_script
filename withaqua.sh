@@ -155,11 +155,6 @@ start_build_process() {
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE" --depth=1
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common --depth=1
     git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv --depth=1
-
-    cat >> device/sony/apollo/lineage_apollo.mk << 'EOF'
-
-    WITAQUA_MAINTAINER := ganendra1945
-    EOF
     
     echo "Starting ROM build..."
     . build/envsetup.sh
