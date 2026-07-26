@@ -7,7 +7,7 @@
 TG_BOT_TOKEN=$(echo "*REMOVED*")
 TG_CHAT_ID=$(echo "*REMOVED*")
 DEVICE_CODE="unknown"
-BUILD_TARGET="WithAqua"
+BUILD_TARGET="WitAqua"
 ANDROID_VERSION="16"
 
 # Setup Timezone
