@@ -158,7 +158,7 @@ start_build_process() {
 
     cat >> device/sony/apollo/lineage_apollo.mk << 'EOF'
 
-    WITAQUA_MAINTAINER := Ganx0000
+    WITAQUA_MAINTAINER := ganendra1945
     EOF
     
     echo "Starting ROM build..."
