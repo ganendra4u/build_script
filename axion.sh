@@ -4,8 +4,8 @@
 # CONFIGURATION
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
-TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598" | base64 -d)
-TG_CHAT_ID=$(echo "7302285501" | base64 -d)
+TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598")
+TG_CHAT_ID=$(echo "7302285501")
 DEVICE_CODE="unknown"
 BUILD_TARGET="AxionOS"
 ANDROID_VERSION="16"
@@ -184,6 +184,7 @@ AXION_MAINTAINER := ganendra1945
 
 # Processor name (underscores become spaces)
 AXION_PROCESSOR := Snapdragon_845
+EOF
 
     echo "Starting ROM build..."
     . build/envsetup.sh
