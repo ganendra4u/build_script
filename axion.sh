@@ -4,8 +4,8 @@
 # CONFIGURATION
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
-TG_BOT_TOKEN=""
-TG_CHAT_ID="${TG_CHAT_ID}"
+TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598" | base64 -d)
+TG_CHAT_ID=$(echo "7302285501" | base64 -d)
 DEVICE_CODE="unknown"
 BUILD_TARGET="AxionOS"
 ANDROID_VERSION="16"
