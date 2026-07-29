@@ -4,17 +4,11 @@
 # CONFIGURATION
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
-TG_BOT_TOKEN="${TG_BOT_TOKEN}"
+TG_BOT_TOKEN=""
 TG_CHAT_ID="${TG_CHAT_ID}"
 DEVICE_CODE="unknown"
 BUILD_TARGET="AxionOS"
 ANDROID_VERSION="16"
-
-# AxionOS "About phone" / device info values
-AXION_MAINTAINER="ganendra"
-AXION_CAMERA_REAR_INFO="19"
-AXION_CAMERA_FRONT_INFO="5"
-AXION_PROCESSOR="Snapdragon_845"
 
 # Setup Timezone
 export TZ="Asia/Jakarta"
@@ -163,16 +157,34 @@ start_build_process() {
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common
     git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv
 
-echo "Injecting sepolicy fix for battery sysfs..."
+echo "Injecting AxionOS sepolicy fixes..."
     mkdir -p device/sony/"$DEVICE_CODE"/sepolicy/vendor
     cat > device/sony/"$DEVICE_CODE"/sepolicy/vendor/battery.te << 'EOF'
 typealias sysfs_battery_supply alias vendor_sysfs_battery_supply;
+typealias sysfs_devfreq alias vendor_sysfs_devfreq;
+typealias sysfs_kgsl alias vendor_sysfs_kgsl;
 EOF
 
     if ! grep -q "VENDOR_SEPOLICY_DIRS" device/sony/"$DEVICE_CODE"/BoardConfig.mk; then
         echo 'BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor' >> device/sony/"$DEVICE_CODE"/BoardConfig.mk
     fi
+
+    echo "Removing duplicate sepolicy entry from tama-common..."
+    sed -i '/genfscon proc \/sys\/kernel\/sched_autogroup_enabled/d' device/sony/tama-common/sepolicy/vendor/genfs_contexts
+
+    echo "Injecting AxionOS device properties..."
+    cat >> device/sony/"$DEVICE_CODE"/lineage_"$DEVICE_CODE".mk << 'EOF'
     
+    # Camera information (multiple sensors supported)
+AXION_CAMERA_REAR_INFO := 19
+AXION_CAMERA_FRONT_INFO := 5
+
+# Maintainer name (underscores become spaces in the UI)
+AXION_MAINTAINER := ganendra1945
+
+# Processor name (underscores become spaces)
+AXION_PROCESSOR := Snapdragon_845
+
     echo "Starting ROM build..."
     . build/envsetup.sh
     brunch "$DEVICE_CODE"
