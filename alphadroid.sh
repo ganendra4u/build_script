@@ -4,8 +4,8 @@
 # CONFIGURATION
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
-TG_BOT_TOKEN=$(echo "*REMOVED*")
-TG_CHAT_ID=$(echo "*REMOVED*")
+TG_BOT_TOKEN="${TG_BOT_TOKEN}"
+TG_CHAT_ID="${TG_CHAT_ID}"
 DEVICE_CODE="unknown"
 BUILD_TARGET="Alphadroid"
 ANDROID_VERSION="16"
