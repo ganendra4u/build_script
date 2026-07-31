@@ -4,8 +4,8 @@
 # CONFIGURATION
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
-TG_BOT_TOKEN="${TG_BOT_TOKEN}"
-TG_CHAT_ID="${TG_CHAT_ID}"
+TG_BOT_TOKEN="8653985889:AAEVbmZ1P8xPyB4pV8PCca-NY6xmV1JmWBk"
+TG_CHAT_ID="7302285501"
 DEVICE_CODE="unknown"
 BUILD_TARGET="RisingOS"
 ANDROID_VERSION="16"
