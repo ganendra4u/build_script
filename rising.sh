@@ -170,14 +170,15 @@ EOF
     echo "Injecting RisingOS device properties..."
     cat >> device/sony/"$DEVICE_CODE"/lineage_"$DEVICE_CODE".mk << 'EOF'
 
+WITH_GMS := true
+TARGET_USES_PICO_GAPPS := true
+
 RISING_MAINTAINER := ganendra1945
 
 PRODUCT_BUILD_PROP_OVERRIDES += \
     RisingMaintainer="ganendra1945" \
     RisingChipset="Snapdragon 845"
 EOF
-
-
     
     echo "Starting ROM build..."
     . build/envsetup.sh
