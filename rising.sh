@@ -157,7 +157,27 @@ start_build_process() {
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common --depth=1
     git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv --depth=1
 
-    WITH_GMS := false
+echo "Injecting RisingOS sepolicy fix for camera property..."
+    mkdir -p device/sony/"$DEVICE_CODE"/sepolicy/vendor
+    cat > device/sony/"$DEVICE_CODE"/sepolicy/vendor/camera_prop.te << 'EOF'
+vendor_restricted_prop(vendor_camera_prop)
+EOF
+
+    if ! grep -q "VENDOR_SEPOLICY_DIRS" device/sony/"$DEVICE_CODE"/BoardConfig.mk; then
+        echo 'BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor' >> device/sony/"$DEVICE_CODE"/BoardConfig.mk
+    fi
+
+    echo "Injecting RisingOS device properties..."
+    cat >> device/sony/"$DEVICE_CODE"/lineage_"$DEVICE_CODE".mk << 'EOF'
+
+RISING_MAINTAINER := ganendra1945
+
+PRODUCT_BUILD_PROP_OVERRIDES += \
+    RisingMaintainer="ganendra1945" \
+    RisingChipset="Snapdragon 845"
+EOF
+
+
     
     echo "Starting ROM build..."
     . build/envsetup.sh
