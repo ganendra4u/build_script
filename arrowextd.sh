@@ -195,7 +195,8 @@ EOF
 
     echo "Starting ROM build..."
     . build/envsetup.sh
-    brunch "$DEVICE_CODE"
+    lunch arrow_apollo-userdebug
+    m bacon
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
