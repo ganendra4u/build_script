@@ -128,7 +128,7 @@ start_build_process() {
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init -u https://github.com/ArrowOS-Extended/android_manifest.git -b arrow-13.1 --git-lfs --depth=1
+    repo init --depth=1 -u https://github.com/ArrowOS-Ext/android_manifest.git -b arrow-13.2
     
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
