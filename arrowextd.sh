@@ -143,30 +143,30 @@ start_build_process() {
     git clone https://github.com/Sorayukii/android_hardware_sony_SonyOpenTelephony -b 13 hardware/sony/SonyOpenTelephony --depth=1
     git clone https://github.com/Sorayukii/proprietary_vendor_sony_"$DEVICE_CODE" -b 13 vendor/sony/"$DEVICE_CODE" --depth=1
     git clone https://github.com/Sorayukii/proprietary_vendor_sony_tama-common -b 13 vendor/sony/tama-common --depth=1
-
+    
 echo "Fixing kernel defconfig name..."
-    sed -i 's/tama_apollo_dcm_defconfig/tama_apollo_defconfig/' device/sony/apollo/BoardConfig.mk
+sed -i "s/tama_${DEVICE_CODE}_kddi_defconfig/tama_${DEVICE_CODE}_defconfig/" device/sony/"$DEVICE_CODE"/BoardConfig.mk
 
-    echo "Renaming device makefile to Arrow naming convention..."
-    cd device/sony/apollo
-    if [ -f lineage_apollo.mk ]; then
-        mv lineage_apollo.mk arrow_apollo.mk
-    fi
-    sed -i 's/PRODUCT_NAME := lineage_apollo/PRODUCT_NAME := arrow_apollo/' arrow_apollo.mk
-    sed -i 's#vendor/lineage/config/common_full_phone.mk#vendor/arrow/config/common.mk#' arrow_apollo.mk
-    sed -i 's/lineage_apollo/arrow_apollo/g' AndroidProducts.mk
+echo "Renaming device makefile to Arrow naming convention..."
+cd device/sony/"$DEVICE_CODE"
+if [ -f lineage_"$DEVICE_CODE".mk ]; then
+    mv lineage_"$DEVICE_CODE".mk arrow_"$DEVICE_CODE".mk
+fi
+sed -i "s/PRODUCT_NAME := lineage_${DEVICE_CODE}/PRODUCT_NAME := arrow_${DEVICE_CODE}/" arrow_"$DEVICE_CODE".mk
+sed -i 's#vendor/lineage/config/common_full_phone.mk#vendor/arrow/config/common.mk#' arrow_"$DEVICE_CODE".mk
+sed -i "s/lineage_${DEVICE_CODE}/arrow_${DEVICE_CODE}/g" AndroidProducts.mk
 
-    if ! grep -q "DEVICE_MAINTAINER" arrow_apollo.mk; then
-        cat >> arrow_apollo.mk << 'EOF'
+if ! grep -q "DEVICE_MAINTAINER" arrow_"$DEVICE_CODE".mk; then
+    cat >> arrow_"$DEVICE_CODE".mk << 'EOF'
 
-DEVICE_MAINTAINER := ganendra1945
+ARROW_MAINTAINER := ganendra1945
 EOF
-    fi
-    cd -
+fi
+cd -
 
-    echo "Adding Arrow maintainer overlay string..."
-    mkdir -p device/sony/apollo/overlay/packages/apps/Settings/res/values
-    cat > device/sony/apollo/overlay/packages/apps/Settings/res/values/arrow_strings.xml << 'EOF'
+echo "Adding Arrow maintainer overlay string..."
+mkdir -p device/sony/"$DEVICE_CODE"/overlay/packages/apps/Settings/res/values
+cat > device/sony/"$DEVICE_CODE"/overlay/packages/apps/Settings/res/values/arrow_strings.xml << 'EOF'
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (C) 2024 ArrowOS-Extended
      Licensed under the Apache License, Version 2.0 (the "License")
@@ -186,17 +186,16 @@ EOF
 </resources>
 EOF
 
-    if ! grep -q "DEVICE_PACKAGE_OVERLAYS" device/sony/apollo/device.mk; then
-        echo 'DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay' >> device/sony/apollo/device.mk
-    fi
+if ! grep -q "DEVICE_PACKAGE_OVERLAYS" device/sony/"$DEVICE_CODE"/device.mk; then
+    echo 'DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay' >> device/sony/"$DEVICE_CODE"/device.mk
+fi
 
-    echo "Fixing malformed XML in tama-common overlay..."
-    sed -i '1{/^$/d}' device/sony/tama-common/overlay/packages/apps/SimpleDeviceConfig/res/values/config.xml
+echo "Fixing malformed XML in tama-common overlay..."
+sed -i '1{/^$/d}' device/sony/tama-common/overlay/packages/apps/SimpleDeviceConfig/res/values/config.xml
 
     echo "Starting ROM build..."
     . build/envsetup.sh
-    lunch arrow_apollo-userdebug
-    m bacon
+    brunch "$DEVICE_CODE"
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
