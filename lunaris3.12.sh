@@ -150,6 +150,11 @@ start_build_process() {
     git clone https://github.com/aoitsme/keys -b master --depth=1 vendor/lineage-priv
 
 sed -i 's/^ro.lunaris.maintainer=.*/ro.lunaris.maintainer=Ganendra1945 | ganx0000/' device/sony/"$DEVICE_CODE"/system.prop
+
+cat >> device/sony/apollo/lineage_apollo.mk << 'EOF'
+USE_REALITY_ENGINE := true
+WITH_GMS := false
+EOF
     
     echo "Starting ROM build..."
     . build/envsetup.sh
