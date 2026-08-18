@@ -168,7 +168,7 @@ sed -i 's/lineage_apollo/clover_apollo/g' AndroidProducts.mk
 # Rename file product mk
 git mv lineage_apollo.mk clover_apollo.mk
 
-# Timpa isi clover_apollo.mk sesuai pola punya temenmu
+# replace
 cat > clover_apollo.mk << 'EOF'
 #
 # Copyright (C) 2018-2020 The LineageOS Project
@@ -189,7 +189,7 @@ PRODUCT_NAME := clover_apollo
 PRODUCT_DEVICE := apollo
 PRODUCT_MANUFACTURER := Sony
 PRODUCT_BRAND := Sony
-PRODUCT_MODEL := Xperia XZ2 Premium
+PRODUCT_MODEL := Xperia XZ2 Compact 
 
 TARGET_BOOT_ANIMATION_RES := 1080
 TARGET_ENABLE_BLUR := true
