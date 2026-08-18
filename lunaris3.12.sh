@@ -189,13 +189,22 @@ PRODUCT_NAME := clover_apollo
 PRODUCT_DEVICE := apollo
 PRODUCT_MANUFACTURER := Sony
 PRODUCT_BRAND := Sony
-PRODUCT_MODEL := Xperia XZ2 Compact 
+PRODUCT_MODEL := Xperia XZ2 Compact
 
 TARGET_BOOT_ANIMATION_RES := 1080
 TARGET_ENABLE_BLUR := true
 TARGET_DISABLE_EPPE := true
-EOF
 
+CLOVER_MAINTAINER := Ganendra1945
+TARGET_SUPPORTS_QUICK_TAP := true
+TARGET_FACE_UNLOCK_SUPPORTED := true
+WITH_GMS := false
+
+PRODUCT_GMS_CLIENTID_BASE := android-sony
+
+PRODUCT_BUILD_PROP_OVERRIDES += \
+    BuildDesc="H8324-user 10 52.1.A.3.49 052001A003004902006556692 release-keys" \
+    BuildFingerprint=Sony/H8324/H8324:10/52.1.A.3.49/052001A003004902006556692:user/release-keys
 cd -
 
 cat > device/sony/apollo/AndroidProducts.mk << 'EOF'
