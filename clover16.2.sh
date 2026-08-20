@@ -154,7 +154,7 @@ start_build_process() {
     echo "Cloning device trees..."
     git clone https://github.com/aoitsme/android_kernel_sony_sdm845 -b bpf kernel/sony/sdm845 --depth=1
     git clone https://github.com/aoitsme/android_device_sony_"$DEVICE_CODE" -b lineage-23.2 device/sony/"$DEVICE_CODE" --depth=1
-    git clone https://github.com/aoitsme/android_device_sony_tama-common -b lineage-23.2 device/sony/tama-common --depth=1
+    git clone https://github.com/aoitsme/android_device_sony_tama-common -b clvr-16.2 device/sony/tama-common --depth=1
     git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 hardware/sony/SonyOpenTelephony --depth=1
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE" --depth=1
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common --depth=1
@@ -232,6 +232,12 @@ COMMON_LUNCH_CHOICES := \
     clover_apollo-userdebug \
     clover_apollo-eng
 EOF
+
+cd device/sony/tama
+
+sed -i 's/BOARD_SYSTEMIMAGE_PARTITION_SIZE := .*/BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3825205248/' BoardConfigCommon.mk
+
+cd -
     
     echo "Starting ROM build..."
     . build/envsetup.sh
