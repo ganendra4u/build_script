@@ -7,7 +7,7 @@
 TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598")
 TG_CHAT_ID=$(echo "7302285501")
 DEVICE_CODE="unknown"
-BUILD_TARGET="Clover"
+BUILD_TARGET="LunarisAOSP"
 ANDROID_VERSION="16"
 
 # Setup Timezone
@@ -117,7 +117,6 @@ start_build_process() {
     rm -rf .repo/local_manifests
     rm -rf kernel/configs
     rm -rf hardware/interfaces
-    rm -rf frameworks/native
     rm -rf kernel/sony
     rm -rf device/sony
     rm -rf hardware/sony
@@ -129,47 +128,39 @@ start_build_process() {
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init -u https://github.com/The-Clover-Project/manifest.git -b 16-qpr2 --git-lfs --depth=1
+    repo init -u https://github.com/AxionAOSP/android.git -b lineage-23.2 --git-lfs --depth=1
 
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
       /opt/crave/resync.sh
     fi
-    repo sync -c --force-sync --optimized-fetch --no-tags --no-clone-bundle --prune
-
+    repo sync
+    
     echo "Replacing some repository..."
     rm -rf kernel/configs
     rm -rf hardware/interfaces
-    git clone https://github.com/crdroidandroid/android_kernel_configs -b 16.0 kernel/configs
-    git clone https://github.com/crdroidandroid/android_hardware_interfaces -b 16.0 hardware/interfaces
+    git clone https://github.com/crdroidandroid/android_kernel_configs -b 16.0 kernel/configs --depth=1
+    git clone https://github.com/crdroidandroid/android_hardware_interfaces -b 16.0 hardware/interfaces --depth=1
 
     echo "Patch frameroks_native..."
     cd frameworks/native
     wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/001-temp-fix-camera.patch
-    wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/002-temp-fix-camera.patch
     git am 001-temp-fix-camera.patch
-    git am 002-temp-fix-camera.patch
     cd -
     
     echo "Cloning device trees..."
-    git clone https://github.com/aoitsme/android_kernel_sony_sdm845 -b bpf kernel/sony/sdm845 --depth=1
-    git clone https://github.com/aoitsme/android_device_sony_"$DEVICE_CODE" -b lineage-23.2 device/sony/"$DEVICE_CODE" --depth=1
-    git clone https://github.com/aoitsme/android_device_sony_tama-common -b clvr-16.2 device/sony/tama-common --depth=1
-    git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 hardware/sony/SonyOpenTelephony --depth=1
-    git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE" --depth=1
-    git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common --depth=1
-    git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv --depth=1 
+    git clone https://github.com/aoitsme/android_kernel_sony_sdm845 -b bpf kernel/sony/sdm845
+    git clone https://github.com/aoitsme/android_device_sony_"$DEVICE_CODE" -b lunaris-16.2 device/sony/"$DEVICE_CODE"
+    git clone https://github.com/aoitsme/android_device_sony_tama-common -b lineage-23.2 device/sony/tama-common
+    git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 hardware/sony/SonyOpenTelephony
+    git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE"
+    git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common
+    git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv
 
 cd device/sony/apollo
 
-# Rename AndroidProducts.mk: lineage_apollo -> clover_apollo
-sed -i 's/lineage_apollo/clover_apollo/g' AndroidProducts.mk
-
-# Rename file product mk
-git mv lineage_apollo.mk clover_apollo.mk
-
 # replace
-cat > clover_apollo.mk << 'EOF'
+cat > lineage_apollo.mk << 'EOF'
 #
 # Copyright (C) 2018-2020 The LineageOS Project
 #
@@ -180,12 +171,12 @@ cat > clover_apollo.mk << 'EOF'
 $(call inherit-product, device/sony/apollo/device.mk)
 
 # Inherit some common Lineage stuff.
-$(call inherit-product, vendor/clover/config/common_full_phone.mk)
+$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
 
 # Setup keystore
 -include vendor/lineage-priv/keys/keys.mk
 
-PRODUCT_NAME := clover_apollo
+PRODUCT_NAME := lineage_apollo
 PRODUCT_DEVICE := apollo
 PRODUCT_MANUFACTURER := Sony
 PRODUCT_BRAND := Sony
@@ -195,10 +186,10 @@ TARGET_BOOT_ANIMATION_RES := 1080
 TARGET_ENABLE_BLUR := true
 TARGET_DISABLE_EPPE := true
 
-CLOVER_MAINTAINER := Ganendra1945
-TARGET_SUPPORTS_QUICK_TAP := true
-TARGET_FACE_UNLOCK_SUPPORTED := true
+USE_REALITY_ENGINE := true
 WITH_GMS := false
+TARGET_USE_FILES := true
+TARGET_USE_GPHOTOS := true
 
 PRODUCT_GMS_CLIENTID_BASE := android-sony
 
@@ -206,43 +197,31 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     BuildDesc="H8324-user 10 52.1.A.3.49 052001A003004902006556692 release-keys" \
     BuildFingerprint=Sony/H8324/H8324:10/52.1.A.3.49/052001A003004902006556692:user/release-keys
 EOF
-cd -
 
-cat > device/sony/apollo/AndroidProducts.mk << 'EOF'
-#
-# Copyright (C) 2018-2019 The LineageOS Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+cat > system.prop << 'EOF'
+# Camera
+camera.disable_zsl_mode=1
 
-PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/clover_apollo.mk
+# SEMC
+ro.semc.ms_type_id=PM-1130-BV
+ro.semc.product.device=H83
+ro.semc.product.model=H8324
+ro.semc.product.name=Xperia XZ2 Compact
+ro.semc.version.fs=GENERIC
+ro.semc.version.fs_revision=52.1.A.3.49
+ro.semc.version.sw=1311-5320
+ro.semc.version.sw_revision=52.1.A.3.49
+ro.semc.version.sw_type=user
+ro.semc.version.sw_variant=GLOBAL-A2
 
-COMMON_LUNCH_CHOICES := \
-    clover_apollo-user \
-    clover_apollo-userdebug \
-    clover_apollo-eng
+# LunarisAOSP maintainer
+ro.lunaris.maintainer=Ganendra1945
 EOF
-
-cd device/sony/tama-common
-
-sed -i 's/BOARD_SYSTEMIMAGE_PARTITION_SIZE := .*/BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3825205248/' BoardConfigCommon.mk
-
 cd -
-    
+
     echo "Starting ROM build..."
     . build/envsetup.sh
-    lunch clover_"$DEVICE_CODE"-bp4a-userdebug
-    mka clover
+    brunch "$DEVICE_CODE"
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
