@@ -233,7 +233,7 @@ COMMON_LUNCH_CHOICES := \
     clover_apollo-eng
 EOF
 
-cd device/sony/tama
+cd device/sony/tama-common
 
 sed -i 's/BOARD_SYSTEMIMAGE_PARTITION_SIZE := .*/BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3825205248/' BoardConfigCommon.mk
 
