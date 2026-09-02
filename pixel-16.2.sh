@@ -155,7 +155,63 @@ start_build_process() {
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE" --depth=1
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common --depth=1
     git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv --depth=1
-    
+
+cd vendor/lineage-priv/keys
+
+#rename key generate
+for f in *.pk8 *.pem; do
+  new=$(echo "$f" | perl -pe 's/^(.+)\1(\.certificate\.override\.(?:pk8|x509\.pem))$/$1$2/')
+  if [ "$new" != "$f" ]; then
+    echo "Renaming: $f -> $new"
+    mv -v -- "$f" "$new"
+  fi
+done
+
+#generate keys
+cd -
+if [ ! -f vendor/lineage-priv/keys/com.android.healthconnect.controller.certificate.override.pk8 ]; then
+  ./development/tools/make_key vendor/lineage-priv/keys/com.android.healthconnect.controller.certificate.override \
+    "/C=US/ST=California/L=Mountain View/O=Android/OU=Android/CN=Android/emailAddress=android@android.com"
+fi
+
+#permission file
+cd vendor/lineage-priv/keys
+chmod 664 *.pk8
+
+#autodiff
+grep -oE '[A-Za-z0-9_.]+\.certificate\.override' keys.mk | sort -u > /tmp/needed_certs.txt
+grep -oE 'name: "[A-Za-z0-9_.]+\.certificate\.override"' Android.bp | sed 's/name: "//;s/"//' | sort -u > /tmp/existing_certs.txt
+comm -23 /tmp/needed_certs.txt /tmp/existing_certs.txt > /tmp/missing_certs.txt
+
+echo "=== list module adding to android.bp ==="
+cat /tmp/missing_certs.txt
+
+#android_app_cert
+while read -r cert; do
+  if [ -n "$cert" ]; then
+    cat >> Android.bp << EOF
+
+android_app_certificate {
+    name: "${cert}",
+    certificate: "${cert}",
+}
+EOF
+  fi
+done < /tmp/missing_certs.txt
+
+#Clean 
+cd -
+rm -rf out/soong/build.lineage_apollo.ninja out/soong/build.clover_apollo.ninja out/soong/.intermediates
+
+./development/tools/make_key vendor/lineage-priv/keys/com.android.federatedcompute.certificate.override \
+  "/C=US/ST=California/L=Mountain View/O=Android/OU=Android/CN=Android/emailAddress=android@android.com"
+
+./development/tools/make_key vendor/lineage-priv/keys/com.android.health.connect.backuprestore.certificate.override \
+  "/C=US/ST=California/L=Mountain View/O=Android/OU=Android/CN=Android/emailAddress=android@android.com"
+
+chmod 664 vendor/lineage-priv/keys/com.android.federatedcompute.certificate.override.pk8 \
+          vendor/lineage-priv/keys/com.android.health.connect.backuprestore.certificate.override.pk8
+  
     echo "Starting ROM build..."
     . build/envsetup.sh
     breakfast apollo
