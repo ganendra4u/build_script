@@ -167,7 +167,7 @@ sed -i '/hal_turbo_adapter_hwservice/d' device/lineage/sepolicy/common/vendor/hw
 
     echo "Starting ROM build..."
     . build/envsetup.sh
-    brunch "$DEVICE_CODE"
+    brunch "$DEVICE_CODE" 2>&1 | tee out/error.log
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
