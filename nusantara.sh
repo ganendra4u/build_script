@@ -128,7 +128,7 @@ start_build_process() {
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init -u https://github.com/AxionAOSP/android.git -b lineage-23.2 --git-lfs --depth=1
+    repo init -u https://github.com/NusantaraProject-ROM/android_manifest -b 12 --depth=1
 
 mkdir -p .repo/local_manifests
 cat > .repo/local_manifests/remove_gms.xml << 'EOF'
@@ -143,18 +143,6 @@ EOF
       /opt/crave/resync.sh
     fi
     repo sync
-    
-    echo "Replacing some repository..."
-    rm -rf kernel/configs
-    rm -rf hardware/interfaces
-    git clone https://github.com/crdroidandroid/android_kernel_configs -b 16.0 kernel/configs --depth=1
-    git clone https://github.com/crdroidandroid/android_hardware_interfaces -b 16.0 hardware/interfaces --depth=1
-
-    echo "Patch frameroks_native..."
-    cd frameworks/native
-    wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/001-temp-fix-camera.patch
-    git am 001-temp-fix-camera.patch
-    cd -
     
     echo "Cloning device trees..."
     git clone https://github.com/LineageOS/android_kernel_sony_sdm845 -b lineage-19.0 kernel/sony/sdm845
