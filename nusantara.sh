@@ -122,6 +122,7 @@ start_build_process() {
     rm -rf hardware/sony
     rm -rf vendor/sony
     rm -rf vendor/lineage-priv
+    rm -rf external/rust
 
     echo "Set github account.."
     git config --global user.name "ganendra"
