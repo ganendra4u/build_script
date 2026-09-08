@@ -146,16 +146,19 @@ start_build_process() {
     cd frameworks/native
     wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/001-temp-fix-camera.patch
     git am 001-temp-fix-camera.patch
+    git am 002-temp-fix-camera.patch
     cd -
     
     echo "Cloning device trees..."
-    git clone https://github.com/aoitsme/android_kernel_sony_sdm845 -b bpf kernel/sony/sdm845 --depth=1
-    git clone https://github.com/aoitsme/android_device_sony_"$DEVICE_CODE" -b lineage-23.2 device/sony/"$DEVICE_CODE" --depth=1
-    git clone https://github.com/aoitsme/android_device_sony_tama-common -b lineage-23.2 device/sony/tama-common --depth=1
-    git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 hardware/sony/SonyOpenTelephony --depth=1
-    git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE" --depth=1
-    git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common --depth=1
-    git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv --depth=1
+    git clone https://github.com/aoitsme/android_kernel_sony_sdm845 -b bpf kernel/sony/sdm845
+    git clone https://github.com/aoitsme/android_device_sony_"$DEVICE_CODE" -b lineage-23.2 device/sony/"$DEVICE_CODE"
+    git clone https://github.com/aoitsme/android_device_sony_tama-common -b lineage-23.2 device/sony/tama-common
+    git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 hardware/sony/SonyOpenTelephony
+    git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE"
+    git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common
+    git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv
+
+cd vendor/lineage-priv/keys
 
 #rename key generate
 for f in *.pk8 *.pem; do
@@ -210,7 +213,6 @@ rm -rf out/soong/build.lineage_apollo.ninja out/soong/build.clover_apollo.ninja 
 
 chmod 664 vendor/lineage-priv/keys/com.android.federatedcompute.certificate.override.pk8 \
           vendor/lineage-priv/keys/com.android.health.connect.backuprestore.certificate.override.pk8
-  
 
 echo "Injecting AxionOS sepolicy fixes..."
     mkdir -p device/sony/"$DEVICE_CODE"/sepolicy/vendor
@@ -243,7 +245,7 @@ EOF
 
     echo "Starting ROM build..."
     . build/envsetup.sh
-    brunch "$DEVICE_CODE"
+    brunch "$DEVICE_CODE" 2>1 | tee build.log
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
