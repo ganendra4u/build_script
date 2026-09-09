@@ -136,12 +136,8 @@ start_build_process() {
     fi
     repo sync
     
-    echo "Replacing some repository..."
-    rm -rf kernel/configs
-    rm -rf hardware/interfaces
-    git clone https://github.com/crdroidandroid/android_kernel_configs -b 16.0 kernel/configs --depth=1
-    git clone https://github.com/crdroidandroid/android_hardware_interfaces -b 16.0 hardware/interfaces --depth=1
-
+    echo 'PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false' >> device/*/apollo/device.mk
+    
     echo "Patch frameroks_native..."
     cd frameworks/native
     wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/001-temp-fix-camera.patch
