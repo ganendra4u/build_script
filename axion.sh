@@ -5,7 +5,7 @@
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
 TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598")
-TG_CHAT_ID=$(echo "7302285501")
+TG_CHAT_ID=$(echo "-1004210759398")
 DEVICE_CODE="unknown"
 BUILD_TARGET="LunarisAOSP"
 ANDROID_VERSION="16"
@@ -115,8 +115,7 @@ start_build_process() {
     
     echo "Removing local changes..."
     rm -rf .repo/local_manifests
-    rm -rf kernel/configs
-    rm -rf hardware/interfaces
+    rm -rf frameworks/native
     rm -rf kernel/sony
     rm -rf device/sony
     rm -rf hardware/sony
@@ -128,101 +127,36 @@ start_build_process() {
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init -u https://github.com/AxionAOSP/android.git -b lineage-23.2 --git-lfs --depth=1
+    repo init -u https://github.com/Lunaris-AOSP/android -b 16.2 --git-lfs --depth=1
 
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
       /opt/crave/resync.sh
     fi
-    repo sync
+    repo sync -c --force-sync --no-clone-bundle --no-tags
     
-    echo "Replacing some repository..."
-    rm -rf kernel/configs
-    rm -rf hardware/interfaces
-    git clone https://github.com/crdroidandroid/android_kernel_configs -b 16.0 kernel/configs --depth=1
-    git clone https://github.com/crdroidandroid/android_hardware_interfaces -b 16.0 hardware/interfaces --depth=1
-
     echo "Patch frameroks_native..."
     cd frameworks/native
     wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/001-temp-fix-camera.patch
+    wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/002-temp-fix-camera.patch
     git am 001-temp-fix-camera.patch
     git am 002-temp-fix-camera.patch
     cd -
-    
+
     echo "Cloning device trees..."
-    git clone https://github.com/aoitsme/android_kernel_sony_sdm845 -b bpf kernel/sony/sdm845
-    git clone https://github.com/aoitsme/android_device_sony_"$DEVICE_CODE" -b lunaris-16.2 device/sony/"$DEVICE_CODE"
-    git clone https://github.com/aoitsme/android_device_sony_tama-common -b lineage-23.2 device/sony/tama-common
-    git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 hardware/sony/SonyOpenTelephony
-    git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE"
-    git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common
-    git clone https://github.com/aoitsme/keys -b new vendor/lineage-priv
-
-cd device/sony/apollo
-
-# replace
-cat > lineage_apollo.mk << 'EOF'
-#
-# Copyright (C) 2018-2020 The LineageOS Project
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-
-# Inherit from apollo device
-$(call inherit-product, device/sony/apollo/device.mk)
-
-# Inherit some common Lineage stuff.
-$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
-
-# Setup keystore
--include vendor/lineage-priv/keys/keys.mk
-
-PRODUCT_NAME := lineage_apollo
-PRODUCT_DEVICE := apollo
-PRODUCT_MANUFACTURER := Sony
-PRODUCT_BRAND := Sony
-PRODUCT_MODEL := Xperia XZ2 Compact
-
-TARGET_BOOT_ANIMATION_RES := 1080
-TARGET_ENABLE_BLUR := true
-TARGET_DISABLE_EPPE := true
-
-USE_REALITY_ENGINE := true
-WITH_GMS := false
-TARGET_USE_FILES := true
-TARGET_USE_GPHOTOS := true
-
-PRODUCT_GMS_CLIENTID_BASE := android-sony
-
-PRODUCT_BUILD_PROP_OVERRIDES += \
-    BuildDesc="H8324-user 10 52.1.A.3.49 052001A003004902006556692 release-keys" \
-    BuildFingerprint=Sony/H8324/H8324:10/52.1.A.3.49/052001A003004902006556692:user/release-keys
-EOF
-
-cat > system.prop << 'EOF'
-# Camera
-camera.disable_zsl_mode=1
-
-# SEMC
-ro.semc.ms_type_id=PM-1130-BV
-ro.semc.product.device=H83
-ro.semc.product.model=H8324
-ro.semc.product.name=Xperia XZ2 Compact
-ro.semc.version.fs=GENERIC
-ro.semc.version.fs_revision=52.1.A.3.49
-ro.semc.version.sw=1311-5320
-ro.semc.version.sw_revision=52.1.A.3.49
-ro.semc.version.sw_type=user
-ro.semc.version.sw_variant=GLOBAL-A2
-
-# LunarisAOSP maintainer
-ro.lunaris.maintainer=Ganendra1945
-EOF
-cd -
-
+    git clone https://github.com/aoitsme/android_kernel_sony_sdm845 -b bpf --depth=1 kernel/sony/sdm845
+    git clone https://github.com/ganendra4u/android_device_sony_"$DEVICE_CODE" -b lunaris-16.2 --depth=1 device/sony/"$DEVICE_CODE"
+    git clone https://github.com/ganendra4u/android_device_sony_tama-common -b lineage-23.2 --depth=1 device/sony/tama-common
+    git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 --depth=1 hardware/sony/SonyOpenTelephony
+    git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 --depth=1 vendor/sony/"$DEVICE_CODE"
+    git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 --depth=1 vendor/sony/tama-common
+    git clone https://github.com/aoi-itsme/keys -b new --depth=1 vendor/lineage-priv
+    
     echo "Starting ROM build..."
     . build/envsetup.sh
-    lunch lineage_apollo-bp4a-user
+    export TARGET_EXCLUDE_MATLOG=false
+    lunch lineage_"$DEVICE_CODE"-bp4a-user
+    m bacon -j$(nproc --all)
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
