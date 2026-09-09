@@ -146,6 +146,7 @@ start_build_process() {
     cd frameworks/native
     wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/001-temp-fix-camera.patch
     git am 001-temp-fix-camera.patch
+    git am 002-temp-fix-camera.patch
     cd -
     
     echo "Cloning device trees..."
@@ -155,7 +156,7 @@ start_build_process() {
     git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 hardware/sony/SonyOpenTelephony
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE"
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common
-    git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv
+    git clone https://github.com/aoitsme/keys -b new vendor/lineage-priv
 
 cd device/sony/apollo
 
@@ -221,7 +222,7 @@ cd -
 
     echo "Starting ROM build..."
     . build/envsetup.sh
-    brunch "$DEVICE_CODE"
+    lunch lineage_apollo-bp4a-user
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
