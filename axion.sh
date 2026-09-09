@@ -245,7 +245,7 @@ EOF
 
     echo "Starting ROM build..."
     . build/envsetup.sh
-    brunch "$DEVICE_CODE" 2>1 | tee build.log
+    lunch lineage_apollo-bp4a-user 2>1 | tee build.log
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
