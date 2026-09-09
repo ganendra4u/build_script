@@ -136,8 +136,6 @@ start_build_process() {
     fi
     repo sync
     
-    echo 'PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false' >> device/*/apollo/device.mk
-    
     echo "Patch frameroks_native..."
     cd frameworks/native
     wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/001-temp-fix-camera.patch
@@ -153,6 +151,8 @@ start_build_process() {
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE"
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common
     git clone https://github.com/aoitsme/keys -b new vendor/lineage-priv
+
+    echo 'PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false' >> device/*/apollo/device.mk
     
     echo "Starting ROM build..."
     . build/envsetup.sh
