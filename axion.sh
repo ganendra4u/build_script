@@ -152,6 +152,8 @@ start_build_process() {
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common
     git clone https://github.com/aoitsme/keys -b new vendor/lineage-priv
 
+echo 'PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false' >> device/*/apollo/device.mk
+
 echo "Injecting AxionOS sepolicy fixes..."
     mkdir -p device/sony/"$DEVICE_CODE"/sepolicy/vendor
     cat > device/sony/"$DEVICE_CODE"/sepolicy/vendor/battery.te << 'EOF'
