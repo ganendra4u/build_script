@@ -189,7 +189,8 @@ EOF
 
     echo "Starting ROM build..."
     . build/envsetup.sh
-    lunch lineage_apollo-bp4a-user 2>1 | tee error.log
+    lunch lineage_apollo-bp4a-user
+    m bacon 2>1 | tee error.log
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
