@@ -126,6 +126,16 @@ start_build_process() {
     git config --global user.name "ganendra"
     git config --global user.email "ganendra2323@gmail.com"
 
+cd .repo/local_manifests
+cat >> device_sony_apollo.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <project name="ganendra4u/android_device_sony_apollo" path="device/sony/apollo" remote="github" revision="lineage-23.2" />
+</manifest>
+EOF
+
+cd -
+
     echo "Initializing repo..."
     repo init -u https://github.com/Evolution-X/manifest -b bka --git-lfs --depth=1
 
@@ -156,7 +166,7 @@ start_build_process() {
     . build/envsetup.sh
     export WITH_GMS=false
     export TARGET_INCLUDE_ACCORD=false
-    export TARGET_INCLUDE_VIPERFX=true
+    export TARGET_INCLUDE_VIPERFX=false
     export TARGET_ENABLE_FP_OVERRIDE=false
     export PERF_ANIM_OVERRIDE=true
     export USE_REALITY_ENGINE=true
