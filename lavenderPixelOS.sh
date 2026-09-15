@@ -125,7 +125,8 @@ start_build_process() {
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init -u https://github.com/PixelOS-AOSP/android_manifest.git -b seventeen --git-lfs
+    repo init -u https://github.com/PixelOS-AOSP/android_manifest.git -b seventeen --git-lfs --depth=1
+    
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
       /opt/crave/resync.sh
