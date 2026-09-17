@@ -152,8 +152,61 @@ start_build_process() {
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 --depth=1 vendor/sony/"$DEVICE_CODE"
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 --depth=1 vendor/sony/tama-common
     git clone https://github.com/aoi-itsme/keys -b new --depth=1 vendor/lineage-priv
+    git clone https://github.com/swiitch-OFF-Lab/hardware_dolby hardware/dolby --depth=1
+
+sed -i \
+  -e 's/^\(\s*DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE\) :=/\1 +=/' \
+  -e 's/^\(\s*DEVICE_MANIFEST_FILE\) :=/\1 +=/' \
+  device/sony/tama-common/BoardConfigCommon.mk
+
+grep -q "hardware/dolby/dolby.mk" device/sony/tama-common/common.mk || \
+sed -i '1i # Dolby\n$(call inherit-product-if-exists, hardware/dolby/dolby.mk)' device/sony/tama-common/common.mk
+
+sed -i '/vendor.audio.dolby.ds2.enabled/d;/vendor.audio.dolby.ds2.hardbypass/d' device/sony/tama-common/vendor.prop
+
+python3 - <<'EOF'
+path = "device/sony/tama-common/audio/audio_effects.xml"
+with open(path) as f:
+    content = f.read()
+
+libs = '''        <!--DOLBY DAP-->
+        <library name="dap" path="libswdap.so"/>
+        <library name="dvl" path="libdlbvol.so"/>
+        <!--DOLBY END-->
+        <!--DOLBY GAME-->
+        <library name="gamedap" path="libswgamedap.so"/>
+        <!--DOLBY END-->
+        <!--DOLBY VQE-->
+        <library name="vqe" path="libswvqe.so"/>
+        <!--DOLBY END-->
+'''
+effects = '''        <!--DOLBY DAP-->
+        <effect name="dap" library="dap" uuid="9d4921da-8225-4f29-aefa-39537a04bcaa"/>
+        <effect name="dlb_music_listener" library="dvl" uuid="40f66c8b-5aa5-4345-8919-53ec431aaa98"/>
+        <effect name="dlb_ring_listener" library="dvl" uuid="21d14087-558a-4f21-94a9-5002dce64bce"/>
+        <effect name="dlb_alarm_listener" library="dvl" uuid="6aff229c-30c6-4cc8-9957-dbfe5c1bd7f6"/>
+        <effect name="dlb_system_listener" library="dvl" uuid="874db4d8-051d-4b7b-bd95-a3bebc837e9e"/>
+        <effect name="dlb_notification_listener" library="dvl" uuid="1f0091e3-6ad8-40fe-9b09-5948f9a26e7e"/>
+        <effect name="dlb_voice_call_listener" library="dvl" uuid="58d13383-b41d-05df-d94e-bb23db293260"/>
+        <!--DOLBY END-->
+        <!--DOLBY GAME-->
+        <effect name="gamedap" library="gamedap" uuid="3783c334-d3a0-4d13-874f-0032e5fb80e2"/>
+        <!--DOLBY END-->
+        <!--DOLBY VQE-->
+        <effect name="vqe" library="vqe" uuid="64a0f614-7fa4-48b8-b081-d59dc954616f"/>
+        <!--DOLBY END-->
+'''
+if "DOLBY DAP" not in content:
+    content = content.replace("</libraries>", libs + "    </libraries>", 1)
+    content = content.replace("</effects>", effects + "    </effects>", 1)
+    with open(path, "w") as f:
+        f.write(content)
+    print("audio_effects.xml updated")
+else:
+    print("skip!")
+EOF
     
-echo 'PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false' >> device/*/apollo/device.mk
+echo 'PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false' >> device/*/"$DEVICE_CODE"/device.mk
 
 echo "Injecting AxionOS sepolicy fixes..."
     mkdir -p device/sony/"$DEVICE_CODE"/sepolicy/vendor
