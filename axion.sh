@@ -216,6 +216,8 @@ typealias sysfs_devfreq alias vendor_sysfs_devfreq;
 typealias sysfs_kgsl alias vendor_sysfs_kgsl;
 EOF
 
+echo 'type vendor_sysfs_kgsl_max_gpuclk, sysfs_type, fs_type;' >> device/sony/"$DEVICE_CODE"/sepolicy/vendor/battery.te
+
     if ! grep -q "VENDOR_SEPOLICY_DIRS" device/sony/"$DEVICE_CODE"/BoardConfig.mk; then
         echo 'BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor' >> device/sony/"$DEVICE_CODE"/BoardConfig.mk
     fi
