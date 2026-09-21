@@ -7,8 +7,8 @@
 TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598")
 TG_CHAT_ID=$(echo "-1004210759398")
 DEVICE_CODE="unknown"
-BUILD_TARGET="AviumUI"
-ANDROID_VERSION="16"
+BUILD_TARGET="Nusantara"
+ANDROID_VERSION="10"
 
 # Setup Timezone
 export TZ="Asia/Jakarta"
@@ -115,47 +115,51 @@ start_build_process() {
     
     echo "Removing local changes..."
     rm -rf .repo/local_manifests
-    rm -rf kernel/sdm660
-    rm -rf device/xiaomi
-    rm -rf hardware/xiaomi
-    rm -rf vendor/xiaomi
+    rm -rf kernel/configs
+    rm -rf hardware/interfaces
+    rm -rf kernel/sony
+    rm -rf device/sony
+    rm -rf hardware/sony
+    rm -rf vendor/sony
+    rm -rf vendor/lineage-priv
+    rm -rf external/rust
 
     echo "Set github account.."
     git config --global user.name "ganendra"
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init -u https://github.com/AviumUI/android_manifests -b avium-16.2 --git-lfs --depth=1
-    
+      repo init -u https://github.com/NusantaraProject-ROM/android_manifest -b 10 --depth=1
+
+mkdir -p .repo/local_manifests
+cat > .repo/local_manifests/remove_gms.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <remove-project name="NusantaraProject/vendor_google_gms" />
+</manifest>
+EOF
+
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
       /opt/crave/resync.sh
     fi
-    repo sync -c --force-sync --no-clone-bundle --no-tags
-
-    echo "Cloning device trees..."
-
-git clone -b avium-16.2-dynamic https://github.com/ganendra4u/android_device_xiaomi_lavender.git device/xiaomi/lavender
-
-git clone -b 16.2-dynamic https://github.com/pix106/android_device_xiaomi_sdm660-common.git device/xiaomi/sdm660-common
-
-git clone -b 16.2 https://github.com/pix106/android_vendor_xiaomi_lavender.git vendor/xiaomi/lavender
-
-git clone -b 16.2 https://github.com/pix106/android_vendor_xiaomi_sdm660-common.git vendor/xiaomi/sdm660-common
-
-git clone -b old/main-dynamic https://github.com/pix106/android_kernel_xiaomi_sdm660_southwest-ng.git kernel/xiaomi/sdm660
-
-git clone https://github.com/pix106/android_hardware_qcom-caf_camera.git hardware/qcom-caf/sdm660/camera
-
-git clone -b android-16 https://github.com/Amritorock/hardware_xiaomi.git hardware/xiaomi
-
-git clone https://github.com/Sa-Sajjad/android_hardware_qcom_display -b 16 hardware/qcom-caf/sdm660/display
-
+    repo sync
     
+    echo "Cloning device trees..."
+    git clone https://github.com/LineageOS/android_kernel_sony_sdm845 -b lineage-17.1 kernel/sony/sdm845
+    git clone https://github.com/ganendra4u/android_device_sony_xz2c -b nusantara-10 device/sony/xz2c
+    git clone https://github.com/ganendra4u/android_device_sony_tama-common -b lineage-17.1 device/sony/tama-common
+    git clone https://github.com/LineageOS/android_hardware_sony_SonyOpenTelephony -b lineage-17.1 hardware/sony/SonyOpenTelephony
+    git clone https://github.com/ganendra4u/proprietary_vendor_sony_apollo -b lineage-17.1 vendor/sony/xz2c
+    git clone https://github.com/ganendra4u/proprietary_vendor_sony_tama-common -b lineage-17.1 vendor/sony/tama-common
+
+ulimit -n 16000
+
     echo "Starting ROM build..."
+    export USE_RBE=false
     . build/envsetup.sh
-    lunch lineage_lavender-bp4a-user
-    m bacon | tee error.log
+    lunch nad_xz2c-userdebug
+    m nad
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
@@ -190,7 +194,7 @@ git clone https://github.com/Sa-Sajjad/android_hardware_qcom_display -b 16 hardw
 
 case "$1" in
 
---aurora)
+    --aurora)
 DEVICE_CODE="aurora"
 start_build_process
 ;;
@@ -215,8 +219,4 @@ DEVICE_CODE="lavender"
 start_build_process
 ;;
 
-*)
-        echo "Usage: $0 [--aurora | --akari | --akatsuki | --apollo]"
-        exit 1
-        ;;
 esac
