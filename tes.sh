@@ -7,7 +7,7 @@
 TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598")
 TG_CHAT_ID=$(echo "-1004210759398")
 DEVICE_CODE="unknown"
-BUILD_TARGET="AxionOS"
+BUILD_TARGET="EvoX"
 ANDROID_VERSION="16"
 
 # Setup Timezone
@@ -115,8 +115,7 @@ start_build_process() {
     
     echo "Removing local changes..."
     rm -rf .repo/local_manifests
-    rm -rf kernel/configs
-    rm -rf hardware/interfaces
+    rm -rf frameworks/native
     rm -rf kernel/sony
     rm -rf device/sony
     rm -rf hardware/sony
@@ -127,14 +126,24 @@ start_build_process() {
     git config --global user.name "ganendra"
     git config --global user.email "ganendra2323@gmail.com"
 
+cd .repo/local_manifests
+cat >> device_sony_apollo.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <project name="ganendra4u/android_device_sony_apollo" path="device/sony/apollo" remote="github" revision="lineage-23.2" />
+</manifest>
+EOF
+
+cd -
+
     echo "Initializing repo..."
-    repo init -u https://github.com/AxionAOSP/android.git -b lineage-23.2 --git-lfs --depth=1
+    repo init -u https://github.com/Evolution-X/manifest -b bka --git-lfs --depth=1
 
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
       /opt/crave/resync.sh
     fi
-    repo sync
+    repo sync -c --force-sync --no-clone-bundle --no-tags
     
     echo "Patch frameroks_native..."
     cd frameworks/native
@@ -143,53 +152,27 @@ start_build_process() {
     git am 001-temp-fix-camera.patch
     git am 002-temp-fix-camera.patch
     cd -
-    
+
     echo "Cloning device trees..."
-    git clone https://github.com/aoitsme/android_kernel_sony_sdm845 -b bpf --depth=1 kernel/sony/sdm845
+    git clone https://github.com/romiyusnandar/kernel_sony_sdm845 -b bpf --depth=1 kernel/sony/sdm845
     git clone https://github.com/ganendra4u/android_device_sony_"$DEVICE_CODE" -b lineage-23.2 --depth=1 device/sony/"$DEVICE_CODE"
-    git clone https://github.com/aoitsme/android_device_sony_tama-common -b lineage-23.2 --depth=1 device/sony/tama-common
+    git clone https://github.com/romiyusnandar/device_sony_tama-common -b lineage-23.2 --depth=1 device/sony/tama-common
     git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 --depth=1 hardware/sony/SonyOpenTelephony
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 --depth=1 vendor/sony/"$DEVICE_CODE"
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 --depth=1 vendor/sony/tama-common
     git clone https://github.com/aoi-itsme/keys -b new --depth=1 vendor/lineage-priv
     
-echo 'PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false' >> device/*/"$DEVICE_CODE"/device.mk
-
-echo "Injecting AxionOS sepolicy fixes..."
-    mkdir -p device/sony/"$DEVICE_CODE"/sepolicy/vendor
-    cat > device/sony/"$DEVICE_CODE"/sepolicy/vendor/battery.te << 'EOF'
-typealias sysfs_battery_supply alias vendor_sysfs_battery_supply;
-typealias sysfs_devfreq alias vendor_sysfs_devfreq;
-typealias sysfs_kgsl alias vendor_sysfs_kgsl;
-EOF
-
-echo 'type vendor_sysfs_kgsl_max_gpuclk, sysfs_type, fs_type;' >> device/sony/"$DEVICE_CODE"/sepolicy/vendor/battery.te
-
-    if ! grep -q "VENDOR_SEPOLICY_DIRS" device/sony/"$DEVICE_CODE"/BoardConfig.mk; then
-        echo 'BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor' >> device/sony/"$DEVICE_CODE"/BoardConfig.mk
-    fi
-
-    echo "Removing duplicate sepolicy entry from tama-common..."
-    sed -i '/genfscon proc \/sys\/kernel\/sched_autogroup_enabled/d' device/sony/tama-common/sepolicy/vendor/genfs_contexts
-
-    echo "Injecting AxionOS device properties..."
-    cat >> device/sony/"$DEVICE_CODE"/lineage_"$DEVICE_CODE".mk << 'EOF'
-    
-    # Camera information (multiple sensors supported)
-AXION_CAMERA_REAR_INFO := 19
-AXION_CAMERA_FRONT_INFO := 5
-
-# Maintainer name (underscores become spaces in the UI)
-AXION_MAINTAINER := Ganendra1945
-
-# Processor name (underscores become spaces)
-AXION_PROCESSOR := Snapdragon_845
-EOF
-
     echo "Starting ROM build..."
     . build/envsetup.sh
-    lunch lineage_apollo-bp4a-user
-    m bacon 2>1 | tee error.log
+    export WITH_GMS=false
+    export TARGET_INCLUDE_ACCORD=false
+    export TARGET_INCLUDE_VIPERFX=false
+    export TARGET_ENABLE_FP_OVERRIDE=false
+    export PERF_ANIM_OVERRIDE=true
+    export USE_REALITY_ENGINE=true
+    lunch lineage_"$DEVICE_CODE"-bp4a-user
+    m installclean
+    m evolution
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
