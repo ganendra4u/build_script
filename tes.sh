@@ -164,7 +164,7 @@ cd -
     
     echo "Starting ROM build..."
     . build/envsetup.sh
-    export WITH_GMS=true
+    export WITH_GMS=false
     export TARGET_INCLUDE_ACCORD=false
     export TARGET_INCLUDE_VIPERFX=false
     export TARGET_ENABLE_FP_OVERRIDE=false
@@ -173,7 +173,6 @@ cd -
     lunch lineage_"$DEVICE_CODE"-bp4a-user
     m installclean
     m evolution
-    make superimage_empty
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
