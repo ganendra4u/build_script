@@ -4,7 +4,7 @@
 # CONFIGURATION
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
-TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598")
+TG_BOT_TOKEN=$(echo "8911784521:AAH3GIv2K0BAGZcRFXGFaZBx-lIsBol1xJM")
 TG_CHAT_ID=$(echo "-1004210759398")
 DEVICE_CODE="unknown"
 BUILD_TARGET="AxionOS"
