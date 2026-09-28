@@ -7,7 +7,7 @@
 TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598")
 TG_CHAT_ID=$(echo "-1004210759398")
 DEVICE_CODE="unknown"
-BUILD_TARGET="GeyRum-Dinamik"
+BUILD_TARGET="AixonAOSP"
 ANDROID_VERSION="16"
 
 # Setup Timezone
@@ -115,7 +115,11 @@ start_build_process() {
     
     echo "Removing local changes..."
     rm -rf .repo/local_manifests
+    rm -rf axion_sdk
+    rm -rf device/axion/common
+    rm -rf hardware/interfaces
     rm -rf frameworks/native
+    rm -rf kernel/configs
     rm -rf kernel/sony
     rm -rf device/sony
     rm -rf hardware/sony
@@ -126,24 +130,22 @@ start_build_process() {
     git config --global user.name "ganendra"
     git config --global user.email "ganendra2323@gmail.com"
 
-cd .repo/local_manifests
-cat >> device_sony_apollo.xml << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<manifest>
-  <project name="ganendra4u/android_device_sony_apollo" path="device/sony/apollo" remote="github" revision="lineage-23.2" />
-</manifest>
-EOF
-
-cd -
-
     echo "Initializing repo..."
-    repo init -u https://github.com/Evolution-X/manifest -b bka --git-lfs --depth=1
+    repo init --depth=1 -u https://github.com/AxionAOSP/android.git -b lineage-23.2 --git-lfs
 
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
       /opt/crave/resync.sh
     fi
-    repo sync -c --force-sync --no-clone-bundle --no-tags
+    repo sync
+
+    echo "Replacing some repository..."
+    rm -rf device/axion/common
+    rm -rf hardware/interfaces
+    rm -rf kernel/configs
+    git clone https://github.com/aoitsme/android_device_axion_common -b lineage-23.2 --depth=1 device/axion/common
+    git clone https://github.com/aoitsme/axion_hardware_interfaces -b lineage-23.2 --depth=1 hardware/interfaces
+    git clone https://github.com/aoi-itsme/android_kernel_configs -b lineage-23.2 --depth=1 kernel/configs
     
     echo "Patch frameroks_native..."
     cd frameworks/native
@@ -154,9 +156,9 @@ cd -
     cd -
 
     echo "Cloning device trees..."
-    git clone https://github.com/romiyusnandar/kernel_sony_sdm845 -b bpf --depth=1 kernel/sony/sdm845
-    git clone https://github.com/ganendra4u/android_device_sony_"$DEVICE_CODE" -b lineage-23.2 --depth=1 device/sony/"$DEVICE_CODE"
-    git clone https://github.com/romiyusnandar/device_sony_tama-common -b lineage-23.2 --depth=1 device/sony/tama-common
+    git clone https://github.com/aoi-itsme/android_kernel_sony_sdm845 -b bpf --depth=1 kernel/sony/sdm845
+    git clone https://github.com/ganendra4u/android_device_sony_"$DEVICE_CODE" -b axion-23.2 --depth=1 device/sony/"$DEVICE_CODE"
+    git clone https://github.com/aoi-itsme/android_device_sony_tama-common -b axion-23.2 --depth=1 device/sony/tama-common
     git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 --depth=1 hardware/sony/SonyOpenTelephony
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 --depth=1 vendor/sony/"$DEVICE_CODE"
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 --depth=1 vendor/sony/tama-common
@@ -164,15 +166,8 @@ cd -
     
     echo "Starting ROM build..."
     . build/envsetup.sh
-    export WITH_GMS=false
-    export TARGET_INCLUDE_ACCORD=false
-    export TARGET_INCLUDE_VIPERFX=false
-    export TARGET_ENABLE_FP_OVERRIDE=false
-    export PERF_ANIM_OVERRIDE=true
-    export USE_REALITY_ENGINE=true
-    lunch lineage_"$DEVICE_CODE"-bp4a-user
-    m installclean
-    m evolution
+    axion "$DEVICE_CODE" user va
+    ax -br
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
