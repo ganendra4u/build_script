@@ -9,6 +9,8 @@ TG_CHAT_ID=$(echo "-1004210759398")
 DEVICE_CODE="unknown"
 BUILD_TARGET="Shinkai"
 ANDROID_VERSION="17"
+export GIT_PAGER=cat
+git config --global core.pager cat
 source /tmp/src/android/.env
 git config --global url."https://${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
 
@@ -153,10 +155,11 @@ start_build_process() {
     echo "patch kernel"
     cd kernel/xiaomi/sdm660
     git checkout -b local-work old/main-dynamic
-    git remote add maaaul https://github.com/Maaaul/android_kernel_xiaomi_sdm660_southwest-nggit fetch maaaul e4eda86dba698dbc95f85f765a44b02b67c451f8
+    git remote add maaaul https://github.com/Maaaul/android_kernel_xiaomi_sdm660_southwest-ng
+    git fetch maaaul e4eda86dba698dbc95f85f765a44b02b67c451f8
     git cherry-pick FETCH_HEAD
     cd -
-
+    
     echo "patch system/core"
     cd system/core
     git checkout -b local-work origin/heptakaideka
