@@ -7,8 +7,8 @@
 TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598")
 TG_CHAT_ID=$(echo "-1004210759398")
 DEVICE_CODE="unknown"
-BUILD_TARGET="AixonAOSP"
-ANDROID_VERSION="16"
+BUILD_TARGET="Shinkai"
+ANDROID_VERSION="17"
 
 # Setup Timezone
 export TZ="Asia/Jakarta"
@@ -115,23 +115,18 @@ start_build_process() {
     
     echo "Removing local changes..."
     rm -rf .repo/local_manifests
-    rm -rf axion_sdk
-    rm -rf device/axion/common
     rm -rf hardware/interfaces
-    rm -rf frameworks/native
-    rm -rf kernel/configs
-    rm -rf kernel/sony
-    rm -rf device/sony
-    rm -rf hardware/sony
-    rm -rf vendor/sony
-    rm -rf vendor/lineage-priv
+    rm -rf kernel/xiaomi
+    rm -rf device/xiaomi
+    rm -rf hardware/xiaomi
+    rm -rf vendor/xiaomi
 
     echo "Set github account.."
     git config --global user.name "ganendra"
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init --depth=1 -u https://github.com/AxionAOSP/android.git -b lineage-23.2 --git-lfs
+    repo init --depth=1 -u https://github.com/ShinkaiProject/shinkai_manifest.git -b heptakaideka --git-lfs
 
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
@@ -139,35 +134,45 @@ start_build_process() {
     fi
     repo sync
 
-    echo "Replacing some repository..."
-    rm -rf device/axion/common
-    rm -rf hardware/interfaces
-    rm -rf kernel/configs
-    git clone https://github.com/aoitsme/android_device_axion_common -b lineage-23.2 --depth=1 device/axion/common
-    git clone https://github.com/aoitsme/axion_hardware_interfaces -b lineage-23.2 --depth=1 hardware/interfaces
-    git clone https://github.com/aoi-itsme/android_kernel_configs -b lineage-23.2 --depth=1 kernel/configs
-    
-    echo "Patch frameroks_native..."
-    cd frameworks/native
-    wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/001-temp-fix-camera.patch
-    wget https://raw.githubusercontent.com/aoitsme/crave_script/refs/heads/main/patch/002-temp-fix-camera.patch
-    git am 001-temp-fix-camera.patch
-    git am 002-temp-fix-camera.patch
+    echo "Cloning device trees..."
+    git clone -b shinkai-17.0-dynamic https://github.com/ganendra4u/android_device_xiaomi_lavender.git device/xiaomi/lavender
+    git clone -b 17.0 https://github.com/pix106/android_vendor_xiaomi_lavender.git vendor/xiaomi/lavender
+    git clone -b old/main-dynamic https://github.com/pix106/android_kernel_xiaomi_sdm660_southwest-ng.git kernel/xiaomi/sdm660
+    git clone -b 17.0-dynamic https://github.com/pix106/android_device_xiaomi_sdm660-common.git device/xiaomi/sdm660-common
+    git clone -b 17.0 https://github.com/pix106/android_vendor_xiaomi_sdm660-common.git vendor/xiaomi/sdm660-common
+    git clone -b lineage-24.0 https://github.com/LineageOS/android_hardware_xiaomi.git hardware/xiaomi
+    rm -rf hardware/qcom-caf/sdm660/display
+    git clone -b lineage-24.0-caf-sdm660 https://github.com/pix106/android_hardware_qcom-caf_display.git hardware/qcom-caf/sdm660/display
+    git clone https://github.com/pix106/android_hardware_qcom-caf_camera.git hardware/qcom-caf/sdm660/camera
+
+    echo "Fixing&patching...."
+    sed -i '/name: "libwfdservice_shim",/,/^}/ s/"libaudioclient",/"libaudioclient",\n        "libaudiobase",/' hardware/lineage/compat/Android.bp
+
+    echo "patch kernel"
+    cd kernel/xiaomi/sdm660
+    git branch -a
+    git checkout -b local-work old/main-dynamic
+    git remote add maaaul https://github.com/Maaaul/android_kernel_xiaomi_sdm660_southwest-nggit fetch maaaul e4eda86dba698dbc95f85f765a44b02b67c451f8
+    git cherry-pick FETCH_HEAD
     cd -
 
-    echo "Cloning device trees..."
-    git clone https://github.com/aoi-itsme/android_kernel_sony_sdm845 -b bpf --depth=1 kernel/sony/sdm845
-    git clone https://github.com/ganendra4u/android_device_sony_"$DEVICE_CODE" -b axion-23.2 --depth=1 device/sony/"$DEVICE_CODE"
-    git clone https://github.com/aoi-itsme/android_device_sony_tama-common -b axion-23.2 --depth=1 device/sony/tama-common
-    git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 --depth=1 hardware/sony/SonyOpenTelephony
-    git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 --depth=1 vendor/sony/"$DEVICE_CODE"
-    git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 --depth=1 vendor/sony/tama-common
-    git clone https://github.com/aoi-itsme/keys -b new --depth=1 vendor/lineage-priv
+    echo "patch system/core"
+    cd system/core
+    git branch -a
+    git checkout -b local-work origin/heptakaideka
+    git remote add pix106 https://github.com/pix106/android_system_core
+    git fetch pix106 69728bc3cd9774412218ca3296fb28d2540d2035
+    git cherry-pick FETCH_HEAD
+    cd -
+
+    echo "dolby"
+    echo "masukkan teks"
+    echo "KSU"
+    echo "masukkan teks"
     
     echo "Starting ROM build..."
     . build/envsetup.sh
-    axion "$DEVICE_CODE" user va
-    ax -br
+    lunch shinkai_"$DEVICE_CODE"-cp2a-user && m shinkai | tee error.log
 
     BUILD_STATUS=${PIPESTATUS[0]}
 
@@ -221,8 +226,12 @@ case "$1" in
         start_build_process
         ;;
         
+    --lavender)
+        DEVICE_CODE="lavender"
+        start_build_process
+        ;;
     *)
-        echo "Usage: $0 [--aurora | --akari | --akatsuki | --apollo]"
+        echo "Usage: $0 [--aurora | --akari | --akatsuki | --apollo | --lavender]"
         exit 1
         ;;
 esac
