@@ -152,7 +152,6 @@ start_build_process() {
 
     echo "patch kernel"
     cd kernel/xiaomi/sdm660
-    git branch -a
     git checkout -b local-work old/main-dynamic
     git remote add maaaul https://github.com/Maaaul/android_kernel_xiaomi_sdm660_southwest-nggit fetch maaaul e4eda86dba698dbc95f85f765a44b02b67c451f8
     git cherry-pick FETCH_HEAD
@@ -160,7 +159,6 @@ start_build_process() {
 
     echo "patch system/core"
     cd system/core
-    git branch -a
     git checkout -b local-work origin/heptakaideka
     git remote add pix106 https://github.com/pix106/android_system_core
     git fetch pix106 69728bc3cd9774412218ca3296fb28d2540d2035
