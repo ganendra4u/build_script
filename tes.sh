@@ -9,6 +9,8 @@ TG_CHAT_ID=$(echo "-1004210759398")
 DEVICE_CODE="unknown"
 BUILD_TARGET="Shinkai"
 ANDROID_VERSION="17"
+source /tmp/src/android/.env
+git config --global url."https://${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # Setup Timezone
 export TZ="Asia/Jakarta"
