@@ -4,8 +4,8 @@
 # CONFIGURATION
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
-TG_BOT_TOKEN="${TG_BOT_TOKEN}"
-TG_CHAT_ID="${TG_CHAT_ID}"
+TG_BOT_TOKEN="$"
+TG_CHAT_ID=""
 DEVICE_CODE="unknown"
 BUILD_TARGET="LineageOS"
 ANDROID_VERSION="17"
@@ -155,7 +155,7 @@ start_build_process() {
     git clone https://github.com/aoitsme/android_hardware_sony_SonyOpenTelephony -b lineage-23.2 hardware/sony/SonyOpenTelephony --depth=1
     git clone https://github.com/aoitsme/proprietary_vendor_sony_"$DEVICE_CODE" -b lineage-23.2 vendor/sony/"$DEVICE_CODE" --depth=1
     git clone https://github.com/aoitsme/proprietary_vendor_sony_tama-common -b lineage-23.2 vendor/sony/tama-common --depth=1
-    git clone https://github.com/aoitsme/keys -b master vendor/lineage-priv --depth=1
+    git clone https://github.com/aoitsme/keys -b new vendor/lineage-priv --depth=1
     
     echo "Starting ROM build..."
     . build/envsetup.sh
@@ -212,9 +212,14 @@ case "$1" in
         DEVICE_CODE="apollo"
         start_build_process
         ;;
+
+    --lavender)
+        DEVICE_CODE="apollo"
+        start_build_process
+        ;;
         
     *)
-        echo "Usage: $0 [--aurora | --akari | --akatsuki | --apollo]"
+        echo "Usage: $0 [--aurora | --akari | --akatsuki | --apollo | --lavender]"
         exit 1
         ;;
 esac
