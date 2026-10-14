@@ -4,16 +4,13 @@
 # CONFIGURATION
 # =========================================================
 # This token was retrieved from your previous log for continuous functionality.
-TG_BOT_TOKEN=$(echo "8653985889:AAEKKInaZBsLpWIJKuRvhhMoz2tHXePD598")
+TG_BOT_TOKEN=$(echo "8653985889:AAE8dafAUb6s3XLreVS4zG-r6TYluT0QAm0")
 TG_CHAT_ID=$(echo "-1004210759398")
 DEVICE_CODE="unknown"
 BUILD_TARGET="Crdroid"
 ANDROID_VERSION="17"
 export GIT_PAGER=cat
 git config --global core.pager cat
-source /tmp/src/android/.env
-git config --global url."https://${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
-
 # Setup Timezone
 export TZ="Asia/Jakarta"
 
@@ -130,7 +127,7 @@ start_build_process() {
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init --depth=1 -u https://github.com/ShinkaiProject/shinkai_manifest.git -b heptakaideka --git-lfs
+    repo init -u https://github.com/crdroidandroid/android.git -b 17.0 --git-lfs --no-clone-bundle --depth=1
 
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
@@ -153,7 +150,45 @@ start_build_process() {
     sed -i '/name: "libwfdservice_shim",/,/^}/ s/"libaudioclient",/"libaudioclient",\n        "libaudiobase",/' hardware/lineage/compat/Android.bp
 
     echo "patching"
-    
+    cd system/core
+git checkout -b local-work origin/17.0
+git remote add pix106 https://github.com/pix106/android_system_core
+git fetch pix106 69728bc3cd9774412218ca3296fb28d2540d2035
+git cherry-pick FETCH_HEAD
+cd -
+
+cd hardware/qcom-caf/sdm660/display
+git checkout -b local-work origin/lineage-24.0-caf-sdm660
+git remote add pix106 https://github.com/pix106/android_hardware_qcom-caf_display
+git fetch pix106 d4d6142215bc0323f6754b7407fa6a584e961e81
+git cherry-pick FETCH_HEAD
+cd -
+
+cd hardware/qcom-caf/common
+git checkout -b local-work origin/lineage-23.2
+git remote add pix106 https://github.com/pix106/android_hardware_qcom-caf_common
+git fetch pix106 b43b186c1e3029e9191fb35dba58f2acd2a76515
+git cherry-pick FETCH_HEAD
+cd -
+
+cd kernel/xiaomi/sdm660
+git checkout -b local-work old/main-dynamic
+git remote add maaaul https://github.com/Maaaul/android_kernel_xiaomi_sdm660_southwest-ng
+git fetch maaaul 2b6ece9c46a6c9ead91e20ccf936b5ff370f26a5
+git cherry-pick FETCH_HEAD
+git fetch maaaul ca790423e214faf5268059a8ab23cf13afa83423
+git cherry-pick FETCH_HEAD
+git fetch maaaul e4eda86dba698dbc95f85f765a44b02b67c451f8
+git cherry-pick FETCH_HEAD
+cd -
+
+cd frameworks/av
+git checkout -b local-work origin/17.0
+git remote add evox https://github.com/Evolution-X/frameworks_av
+git fetch evox c00e9ec4b4c26f56e042b7363083aaa4ddc3b5f6
+git cherry-pick FETCH_HEAD
+cd -
+
     echo "Starting ROM build..."
     . build/envsetup.sh
     brunch lavender | tee error.log
