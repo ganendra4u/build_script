@@ -136,10 +136,10 @@ start_build_process() {
     repo sync
 
     echo "Cloning device trees..."
-    git clone -b lineage-24.0-dynamic https://github.com/ganendra4u/android_device_xiaomi_lavender.git device/xiaomi/lavender
+    git clone -b 17.0 https://github.com/crdroidandroid/android_device_xiaomi_lavender.git device/xiaomi/lavender
     git clone -b 17.0 https://github.com/pix106/android_vendor_xiaomi_lavender.git vendor/xiaomi/lavender
     git clone -b old/main-dynamic https://github.com/pix106/android_kernel_xiaomi_sdm660_southwest-ng.git kernel/xiaomi/sdm660
-    git clone -b 17.0-dynamic https://github.com/pix106/android_device_xiaomi_sdm660-common.git device/xiaomi/sdm660-common
+    git clone -b 17.0-lavender https://github.com/crdroidandroid/android_device_xiaomi_sdm660-common.git device/xiaomi/sdm660-common
     git clone -b 17.0 https://github.com/pix106/android_vendor_xiaomi_sdm660-common.git vendor/xiaomi/sdm660-common
     git clone -b lineage-24.0 https://github.com/LineageOS/android_hardware_xiaomi.git hardware/xiaomi
     rm -rf hardware/qcom-caf/sdm660/display
