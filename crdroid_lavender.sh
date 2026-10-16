@@ -11,6 +11,7 @@ BUILD_TARGET="Crdroid"
 ANDROID_VERSION="17"
 export GIT_PAGER=cat
 git config --global core.pager cat
+export BUILD_USERNAME=ganx
 # Setup Timezone
 export TZ="Asia/Jakarta"
 
