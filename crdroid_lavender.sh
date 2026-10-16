@@ -121,6 +121,7 @@ start_build_process() {
     rm -rf device/xiaomi
     rm -rf hardware/xiaomi
     rm -rf vendor/xiaomi
+    rm -rf hardware
 
     echo "Set github account.."
     git config --global user.name "ganendra"
@@ -161,13 +162,6 @@ cd hardware/qcom-caf/sdm660/display
 git checkout -b local-work origin/lineage-24.0-caf-sdm660
 git remote add pix106 https://github.com/pix106/android_hardware_qcom-caf_display
 git fetch pix106 d4d6142215bc0323f6754b7407fa6a584e961e81
-git cherry-pick FETCH_HEAD
-cd -
-
-cd hardware/qcom-caf/common
-git checkout -b local-work origin/lineage-23.2
-git remote add pix106 https://github.com/pix106/android_hardware_qcom-caf_common
-git fetch pix106 b43b186c1e3029e9191fb35dba58f2acd2a76515
 git cherry-pick FETCH_HEAD
 cd -
 
