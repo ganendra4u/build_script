@@ -129,7 +129,7 @@ start_build_process() {
     git config --global user.email "ganendra2323@gmail.com"
 
     echo "Initializing repo..."
-    repo init -u https://github.com/crdroidandroid/android.git -b 17.0 --git-lfs --no-clone-bundle --depth=1
+    repo init -u https://github.com/crdroidandroid/android.git -b 17.0 --git-lfs --no-clone-bundle --depth=1 | tee log3.txt
 
     echo "Syncing sources..."
     if [ -f /opt/crave/resync.sh ]; then
@@ -186,8 +186,11 @@ cd -
 
     echo "Starting ROM build..."
     . build/envsetup.sh
-    brunch lavender | tee error.log
+    lunch lineage_lavender-cp2a-userdebug | tee log1.txt
+    m bacon -j$(nproc --all) | tee log2.txt
 
+    rm error.log
+    cat log1.txt log2.txt log3.txt > error.log
     BUILD_STATUS=${PIPESTATUS[0]}
 
     END_TIME=$(date +%s)
