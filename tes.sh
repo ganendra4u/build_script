@@ -8,6 +8,12 @@ echo "=================="
 echo "Repo init success"
 echo "=================="
 
+# Build Sync
+/opt/crave/resync.sh 
+echo "============="
+echo "Sync success"
+echo "============="
+
 # clone tree
 git clone -b lineage-23.2-dynamic https://github.com/pix106/android_device_xiaomi_lavender.git device/xiaomi/lavender
 git clone -b 16.2-dynamic https://github.com/pix106/android_device_xiaomi_sdm660-common.git device/xiaomi/sdm660-common
@@ -19,12 +25,6 @@ git clone -b android-16 https://github.com/Amritorock/hardware_xiaomi.git hardwa
 echo "============================"
 echo "clone dt successful"
 echo "============================"
-
-# Build Sync
-/opt/crave/resync.sh 
-echo "============="
-echo "Sync success"
-echo "============="
 
 # Set up build environment
 source build/envsetup.sh
